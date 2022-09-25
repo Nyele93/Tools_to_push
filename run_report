@@ -10,6 +10,8 @@ declare -r custom_host_file="custom_deployment_hosts"
 declare -r local_hosts_file="local_hosts_file"
 declare -r custom_dns_file="custom_dns_file"
 declare -r inv_group_name="dbservers"
+declare tags=$1
+declare skip_tags=$2
 
 #read config file for: customer_name, mariadb_user, mariadb_password
 . deploy.conf
@@ -29,14 +31,6 @@ cust_name=${name-$default_customer}
 echo
 echo $intro_info
 echo "-----------------------------------------------------------"
-
-while getopts u:p: option; do
-        case $option in 
-                u) mariadb_user=$OPTARG;;
-                p) mariadb_password=$OPTARG;;
-                ?) echo "unknown flag"
-        esac
-done
 
 printTableformat(){
     local -r delimiter="${1}"
@@ -132,7 +126,8 @@ EOF
 #EOF
 
 launch_ansible_dynamic(){
-  ansible-playbook audit.yml -i $custom_host_file
+  
+  ansible-playbook audit.yml -i $custom_host_file --tags=$specif
   #reset values in roles var file
    sed -i "s/$mariadb_user/mariadb_usr/g" ./performance_audit/vars/main.yml
    sed -i "s/$mariadb_password/mariadb_pwd/g" ./performance_audit/vars/main.yml
@@ -140,7 +135,19 @@ launch_ansible_dynamic(){
 }
 
 launch_anisble_local(){
-  ansible-playbook audit.yml -i $local_hosts_file
+                      if [[ ! -z $tags  && $skip_tags == "false" ]] ; then
+			ansible-playbook audit.yml -i $local_hosts_file --tags=$tags
+
+		      elif  [[ $tags == "false" && ! -z $skip_tags ]]; then 
+                       ansible-playbook audit.yml -i $local_hosts_file --skip-tags=$skip_tags
+                      
+                        elif  [[ $tags == "all" || $tags == "" ]]; then 
+                           echo $tags
+                      # ansible-playbook audit.yml -i $local_hosts_file --tags=all
+
+                      else
+                       ansible-playbook audit.yml -i $local_hosts_file --tags=all
+                    fi
    #reset values in roles var file
    sed -i "s/$mariadb_user/mariadb_usr/g" ./performance_audit/vars/main.yml
    sed -i "s/$mariadb_password/mariadb_pwd/g" ./performance_audit/vars/main.yml
