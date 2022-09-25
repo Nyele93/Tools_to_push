@@ -1,5 +1,5 @@
 ---
-- name: check innodb_buffer_pool size
+- name: check database version
   tags: check_db_version
   block:
   - name: Check_Existing_DB_Service
@@ -11,12 +11,10 @@
     debug: 
       msg: "{{ db_service_check.stdout }}"
     when: db_service_check.stdout | length > 0
-    tags: db_service_status
 
   - name: Check DB version
     command: "mysql -BNe 'select @@version;'"
     register: mariadb_version
-    tags: check_db_version
 
   - name: create report file and write header
     shell: echo "* Check MariaDB version" >> {{ reportdir }}/dbVersion_check
