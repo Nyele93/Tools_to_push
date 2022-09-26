@@ -11,7 +11,14 @@
 	fi
 
 install_tool(){
-   echo "got here"
+
+    cp -u audit_report_performanc audit.yml deploy.conf .token_key $BASE_DIR/
+    cp -u -R performance_audit/ $BASE_DIR/
+
+    cp -u audit_report_performance audit.yml deploy.conf .token_key /usr/local/sbin/
+    cp -R performance_audit/ /usr/local/sbin
+ 
+   echo "Setup Process completed. please confirm files in $BASE_DIR"
 }
 
 build_config()

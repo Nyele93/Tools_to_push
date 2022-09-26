@@ -1,4 +1,95 @@
+#!/bin/bash
+
+usage() { 
+          echo -e "\033[33m Usage: $(basename ${0}) [--tags <tags_name>] | [--skip-tags <tag_name>] | [-a|--all].\033[0m"
+          echo -e "\033[33m [use $(basename ${0}) --help for more info]\033[0m" 1>&2; exit 1; 
+         }
+
+list_tags(){
+      #helper script to list all available tags for executing playbook at tag level.
+	ansible-playbook audit.yml -i local_hosts_file --list-tags 2>&1 |
+	grep "TASK TAGS" |
+	cut -d":" -f2 |
+	awk '{sub(/\[/, "")sub(/\]/, "")}1' |
+	sed -e 's/,//g' |
+	xargs -n 1 |
+	sort -u | 
+	nl -s  "..." -w3 -n rn 
+  }
+
+while test $# -gt 0; do
+  case "$1" in
+    -h|--help)
+      echo "$package - attempt to capture full details"
+      echo " "
+      echo "options:"
+      echo "-h, --help                show brief help"
+      echo "-t=ACTION, --tag=ACTION   specify specific task to execute in plabook, using the attached tag."
+      echo "-st, --show-tags          show all available tags in playbook."
+      echo "-a, --all                 execute all tasks in the playbook."
+      usage
+      exit 0
+      ;;
+     -t| --tags)
+         if [ "$2" ]; then
+            tags=$2
+             run_report $tags false
+             exit 0
+              shift
+              else
+                   echo 'ERROR: "-t | --tags" requires a non-empty option argument.'
+                  exit 1
+              fi
+               shift
+              ;;
+
+     --skip-tags)
+         if [ "$2" ]; then
+            skip_tags=$2
+             run_report false $skip_tags
+             exit 0
+              shift
+              else
+                   echo 'ERROR: "--skip-tags" requires a non-empty option argument.'
+                  exit 1
+              fi
+               shift
+              ;;
+
+    -a| --all)
+      run_report all
+      exit 0
+      shift
+      ;;
+
+    -st| --show-tags)
+      echo "playbook can be executed for any of the tags attached to a task."
+      echo "to run the entire tasks in the playbook, use the option: --tags all or --all, else replace all with any of the below tags to run specific report."
+      list_tags
+      exit 0
+      shift
+      ;;
+    *)
+        if test $# = 0 ; then
+          #./run_report
+          empty string
+      else
+      echo "Invalid option entered"
+      exit 1
+       fi 
+      break
+      ;;
+  esac
+done
+
+#if [[ $# -eq 0 ]]; then
+#    usage
+#fi
+
 #!/bin/bash 
+
+run_report(){
+
 #ToDO: fill on meta data info
 declare -r intro_info="Starting automated Performance Audit(v1.0) $(date +'%d/%m/%Y %H:%M:%S')"
 declare -a details_arr
@@ -6,10 +97,11 @@ declare -A full_details
 declare -i inst_nos
 #declare array to hold instance details
 declare hosts_array=()
-declare -r custom_host_file="custom_deployment_hosts"
-declare -r local_hosts_file="local_hosts_file"
+declare -r custom_host_file="./performance_audit/files/custom_deployment_hosts"
+declare -r local_hosts_file="./performance_audit/files/local_hosts_file"
 declare -r custom_dns_file="custom_dns_file"
 declare -r inv_group_name="dbservers"
+declare -r server_details="./performance_audit/files/server_details"
 declare tags=$1
 declare skip_tags=$2
 
@@ -110,8 +202,8 @@ function trimString(){
   sed 's,^[[:blank:]]*,,' <<< "${string}" | sed 's,[[:blank:]]*$,,'
 }
 
-touch server_details
-cat > server_details <<-EOF
+touch $server_details
+cat > $server_details <<-EOF
 S/N,ALIAS,HOST,SSH_USER,SSH_PASSWORD
 EOF
 #create custom host file deployment
@@ -140,11 +232,8 @@ launch_anisble_local(){
 
 		      elif  [[ $tags == "false" && ! -z $skip_tags ]]; then 
                        ansible-playbook audit.yml -i $local_hosts_file --skip-tags=$skip_tags
-                      
-                        elif  [[ $tags == "all" || $tags == "" ]]; then 
-                          
+                        #elif  [[ $tags == "all" || $tags == "" ]]; then 
                       # ansible-playbook audit.yml -i $local_hosts_file --tags=all
-
                       else
                        ansible-playbook audit.yml -i $local_hosts_file --tags=all
                     fi
@@ -210,7 +299,7 @@ if [[ $no_instances -gt 0 ]]; then
      hosts_array[$((i-1))]="$host"
 declare redacted_pwd=${ssh_password//[a-z0-9]/x}
 #line should execute only if using dynamic hosts
-cat >> server_details <<-EOF
+cat >> $server_details <<-EOF
 $inst_no,$alias,$host,$ssh_user,$redacted_pwd
 EOF
 
@@ -222,7 +311,7 @@ EOF
   done
 echo
 
-   printTableformat ',' "$(cat server_details)"
+   printTableformat ',' "$(cat $server_details)"
    echo
    while [[ -z $conf_pr ]]
    do
@@ -266,3 +355,7 @@ do
         esac
 	break
 done
+
+}
+
+run_report

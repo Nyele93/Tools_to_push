@@ -3,9 +3,8 @@
   tags: check_db_version
   block:
   - name: Check_Existing_DB_Service
-    script: ./check_existing_db_service.sh
+    script: check_existing_db_service.sh
     register: db_service_check
-    tags: check_db_service
 
   - name: Display_DB_Service_Status
     debug: 
