@@ -142,7 +142,7 @@ launch_anisble_local(){
                        ansible-playbook audit.yml -i $local_hosts_file --skip-tags=$skip_tags
                       
                         elif  [[ $tags == "all" || $tags == "" ]]; then 
-                           echo $tags
+                          
                       # ansible-playbook audit.yml -i $local_hosts_file --tags=all
 
                       else

@@ -1,4 +1,9 @@
 #!/bin/bash
+usage() { 
+          echo -e "\033[31;5mIncorrect usage!\033[0m"
+          echo -e "\033[33m Usage: $(basename ${0}) [--tags <tags_name>] | [--skip-tags <tag_name>] | [-a|--all].\033[0m"
+          echo -e "\033[33m [use $(basename ${0}) --help for more info]\033[0m" 1>&2; exit 1; 
+         }
 
 while test $# -gt 0; do
   case "$1" in
@@ -65,3 +70,7 @@ while test $# -gt 0; do
       ;;
   esac
 done
+
+if [[ $# -eq 0 ]]; then
+    usage
+fi 

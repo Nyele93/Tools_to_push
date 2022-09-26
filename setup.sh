@@ -1,7 +1,48 @@
-#!/bin/bash 
+#!/bin/bash
 
-#run below to configure setup. 
+        BASE_DIR=/etc/mariadb/audit_config
+        CONFIGNAME=deploy.conf
+        CONFIGFILE=$BASE_DIR/$CONFIGNAME
 
-#ToDo: add script to path
+        if [ "$(which curl 2>/dev/null)" = "" ]
+	then
+		echo "This script requires the curl package. Please install it."
+		exit 1
+	fi
 
-#echo $PATH, SAVE TO VARIABLE, and append script.
+install_tool(){
+   echo "got here"
+}
+
+build_config()
+{
+	if [ "$LOGNAME" != "root" ]
+	then
+		CONFIGFILE=$BASE_DIR/$CONFIGNAME
+	else
+		[[ ! -d $BASE_DIR ]] && mkdir $BASE_DIR
+	fi
+
+	if [ -f $CONFIGFILE ]
+	then
+		echo "Config file: '$CONFIGFILE' already exists, no overwrite of current config."
+        else 
+             cp ./$CONFIGNAME $BASE_DIR/$CONFIGNAME
+             echo "Created '$CONFIGFILE'. Please adjust it according to your setup."
+	fi
+
+           if  [[ ! -f $BASE_DIR/audit_performance ]]
+                 then
+                   install_tool
+            else
+                echo "Tool seems to have been installed. Please check Base Directory."
+           fi
+   
+	exit 0
+	}
+
+build_config; 
+
+exit 0
+
+
