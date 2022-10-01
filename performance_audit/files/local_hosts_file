@@ -1,0 +1,5 @@
+#do not delete. 
+# 
+[dbservers]
+#node1 ansible_ssh_host=host ansible_connection=ssh ansible_user=user
+

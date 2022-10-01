@@ -1,0 +1,14 @@
+---
+- name: start main tasks
+  hosts: dbservers
+  gather_facts: true
+  become: true
+  strategy: linear
+  roles:
+    - performance_audit
+
+#- name: Tomcat deployment playbook
+  #hosts: 192.168.1.5
+  #remote_user: ubuntu
+  #roles:
+    #- tomcat
