@@ -90,4 +90,4 @@
 
   - name: echo report directory
     debug: msg="report written to file - {{ reportdir }}/table_metrics_check"
-    when: "file_written.rc == 0"
+    #when: "file_written.rc == 0"

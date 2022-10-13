@@ -47,4 +47,4 @@
 
   - name: echo report directory
     debug: msg="report written to file - {{ reportdir }}/threads_io_check"
-    when: "file_written.rc == 0"
+    #when: "file_written.rc == 0"

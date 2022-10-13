@@ -2,4 +2,7 @@
 # 
 [dbservers]
 #node1 ansible_ssh_host=host ansible_connection=ssh ansible_user=user
-
+frpspltn3-10228 ansible_ssh_host=192.168.37.5 ansible_connection=ssh ansible_user=mariadbadmin
+frpsiltn3-10233  ansible_ssh_host=192.168.37.6 ansible_connection=ssh ansible_user=mariadbadmin
+frpsillf1-10229 ansible_ssh_host=192.168.37.9 ansible_connection=ssh ansible_user=mariadbadmin
+frpsillf1-10236 ansible_ssh_host=192.168.37.10 ansible_connection=ssh ansible_user=mariadbadmin

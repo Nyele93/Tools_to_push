@@ -1,6 +1,6 @@
 ---
 # vars file for performance_audit
-reportdir: /tmp
+reportdir: /etc/mariadb_rdba/mariadb_tool
 mariadb_user: mariadb_usr
-mariadb_pwd: mariadb_pwd
+mariadb_password: x[fu7e8VDnwmb#CF
 

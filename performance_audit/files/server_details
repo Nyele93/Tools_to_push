@@ -1,2 +1,2 @@
 S/N,ALIAS,HOST,SSH_USER,SSH_PASSWORD
-,node1,127.0.0.1,root,"not set(using keys)"
+1,node1,192.168.37.9,mariadbadmin,xxxxxxxxxxxxxxxxxxxx
