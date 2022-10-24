@@ -14,6 +14,13 @@
       for s in  /sys/block/*/queue/scheduler; do disk=$(echo $s | cut -d "/" -f 4); echo -n "   $disk- "; cat $s; done
     register: io_scheduler_settings
     tags: check_io_scheduler_settings
+    
+  - name: check Transparent HugePages
+    shell: |
+      echo
+      cat /sys/kernel/mm/transparent_hugepage/enabled | cut -d "[" -f2 | awk -F] '{print $1}'
+    register: transparent_hugepages
+    tags: check_transparent_hugepages
 
   - name: check linux swappiness setting
     shell: | 
@@ -36,6 +43,16 @@
 
   - name: write report to file
     shell: echo "scheduler setting for {{ ansible_hostname }} - {{ io_scheduler_settings.stdout }} " >> {{ reportdir }}/OS_metrics_check
+    delegate_to: 127.0.0.1
+    
+  - name: create report file and write header
+    shell: echo "* Check Transparent HugePages setting" >> {{ reportdir }}/OS_metrics_check
+    delegate_to: 127.0.0.1
+    run_once: true
+    when: inventory_hostname == ansible_play_hosts_all[0]
+
+  - name: write report to file
+    shell: echo "Transparent Hugepages for {{ ansible_hostname }} - {{ transparent_hugepages.stdout }}" >> {{ reportdir }}/OS_metrics_check
     delegate_to: 127.0.0.1
 
   - name: create report file and write header
